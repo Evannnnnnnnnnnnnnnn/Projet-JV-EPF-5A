@@ -1,11 +1,12 @@
 using UnityEngine;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
+using System.Collections.Generic;
 
 [TaskCategory("MyTasks")]
 [TaskDescription("Select non targeted enemy Drone")]
 
-public class SelectEnemyDrone : Action
+public class RED_SelectEnemy : Action
 {
 	IArmyElement m_ArmyElement;
 	public SharedTransform target;
@@ -15,17 +16,19 @@ public class SelectEnemyDrone : Action
 	public Vector3 Position
 	{ get { return m_Position; } set { m_Position = value; }
 	}*/
+	List<ArmyElement> _AllEnemies;
 
 	public override void OnAwake()
 	{
-		m_ArmyElement =(IArmyElement) GetComponent(typeof(IArmyElement));
+		m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
+		_AllEnemies = m_ArmyElement.ArmyManager.GetAllEnemies(true);
 	}
 
 	public override TaskStatus OnUpdate()
 	{
-		if (m_ArmyElement.ArmyManager == null) return TaskStatus.Running; // la référence à l'armée n'a pas encore été injectée
+		if (m_ArmyElement.ArmyManager == null) return TaskStatus.Running; // la rï¿½fï¿½rence ï¿½ l'armï¿½e n'a pas encore ï¿½tï¿½ injectï¿½e
 
-		target.Value = m_ArmyElement.ArmyManager.GetRandomEnemy<Drone>(transform.position,minRadius.Value,maxRadius.Value)?.transform;
+		target.Value = m_ArmyElement.ArmyManager.GetRandomEnemyOfTypeByDistance<Drone>(transform.position,minRadius.Value,maxRadius.Value)?.transform;
 		if (target.Value != null) return TaskStatus.Success;
 		else return TaskStatus.Failure;
 
