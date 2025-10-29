@@ -27,7 +27,19 @@ public abstract class ArmyManager : MonoBehaviour
     public List<ArmyElement> GetAllAllies(bool sortRandom, ArmyElement allyBuyer)
     {
         var allies = GameObject.FindObjectsOfType<ArmyElement>().Where(element => element != allyBuyer && element.gameObject.CompareTag(m_ArmyTag)).ToList();
-        if (sortRandom) allies.Sort((a, b) => Random.value.CompareTo(.5f));
+        if (sortRandom)
+        {
+            System.Random rng = new System.Random();
+            int n = allies.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                ArmyElement value = allies[k];
+                allies[k] = allies[n];
+                allies[n] = value;
+            }
+        }
         return allies;
     }
 
@@ -53,7 +65,19 @@ public abstract class ArmyManager : MonoBehaviour
     public List<ArmyElement> GetAllEnemies(bool sortRandom)
     {
         var enemies = GameObject.FindObjectsOfType<ArmyElement>().Where(element => !element.gameObject.CompareTag(m_ArmyTag)).ToList();
-        if (sortRandom) enemies.Sort((a, b) => Random.value.CompareTo(.5f));
+        if (sortRandom)
+        {
+            System.Random rng = new System.Random();
+            int n = enemies.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                ArmyElement value = enemies[k];
+                enemies[k] = enemies[n];
+                enemies[n] = value;
+            }
+        }
         return enemies;
     }
 
