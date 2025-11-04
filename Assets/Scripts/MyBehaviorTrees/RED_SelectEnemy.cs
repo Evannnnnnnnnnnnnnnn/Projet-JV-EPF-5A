@@ -12,25 +12,44 @@ public class RED_SelectEnemy : Action
 	public SharedTransform target;
 	public SharedFloat minRadius;
 	public SharedFloat maxRadius;
-	/* Vector3 m_Position;
-	public Vector3 Position
-	{ get { return m_Position; } set { m_Position = value; }
-	}*/
-	List<ArmyElement> _AllEnemies;
+    List<ArmyElement> _AllEnemies;
+    bool _isInitialized = false; // Renommé pour plus de clarté
 
 	public override void OnAwake()
 	{
-		m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
-		_AllEnemies = m_ArmyElement.ArmyManager.GetAllEnemies(true);
+        m_ArmyElement = (IArmyElement) GetComponent(typeof(IArmyElement));
 	}
 
 	public override TaskStatus OnUpdate()
-	{
-		if (m_ArmyElement.ArmyManager == null) return TaskStatus.Running; // la r�f�rence � l'arm�e n'a pas encore �t� inject�e
+    {
+        // Tant que la référence n'est pas injectée par ArmyManager, on attend.
+        if (m_ArmyElement.ArmyManager == null) 
+        {
+            // On retourne "Running" pour que la tâche continue d'essayer à la frame suivante
+            return TaskStatus.Running;
+        }
 
-		target.Value = m_ArmyElement.ArmyManager.GetRandomEnemyOfTypeByDistance<Drone>(transform.position,minRadius.Value,maxRadius.Value)?.transform;
-		if (target.Value != null) return TaskStatus.Success;
-		else return TaskStatus.Failure;
+        // On exécute cela seulement si le manager est prêt ET si on ne l'a pas déjà fait.
+        if (!_isInitialized)
+        {
+            _AllEnemies = m_ArmyElement.ArmyManager.GetAllEnemies(false);
+            _isInitialized = true; // On marque comme initialisé
+        }
 
+        if (target.Value == null)
+        {
+            _AllEnemies.RemoveAll(item => item == null);
+
+            if (_AllEnemies.Count > 0)
+            {
+                target.Value = _AllEnemies[0].transform;
+            }
+            else
+            {
+                return TaskStatus.Failure;
+            }
+        }
+
+        return TaskStatus.Success;
 	}
 }
