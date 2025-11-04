@@ -20,6 +20,10 @@ public class TurretSeekTarget : Action
 	public override void OnStart()
 	{
 		hasRotated = false;
+		// if (target.Value == null)
+		// {
+		// 	return;
+		// }
 		turret.RotateTowards(target.Value.position, () => hasRotated = true);
 	}
 
