@@ -6,13 +6,14 @@ using System.Collections.Generic;
 [TaskCategory("MyTasks")]
 [TaskDescription("Select non targeted enemy Drone")]
 
-public class RED_SelectEnemy : Action
+public class REDTurretsSelectEnemy : Action
 {
 	IArmyElement m_ArmyElement;
 	public SharedTransform target;
 	public SharedFloat minRadius;
 	public SharedFloat maxRadius;
-    List<ArmyElement> _AllEnemies;
+    List<ArmyElement> _AllEnemiesTurrets;
+    List<ArmyElement> _AllEnemiesDrones;
     bool _isInitialized = false; // Renommé pour plus de clarté
 
 	public override void OnAwake()
@@ -32,17 +33,24 @@ public class RED_SelectEnemy : Action
         // On exécute cela seulement si le manager est prêt ET si on ne l'a pas déjà fait.
         if (!_isInitialized)
         {
-            _AllEnemies = m_ArmyElement.ArmyManager.GetAllEnemies(false);
+            _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(true);
+            _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(true);
+
             _isInitialized = true; // On marque comme initialisé
         }
 
         if (target.Value == null)
         {
-            _AllEnemies.RemoveAll(item => item == null);
+            _AllEnemiesTurrets.RemoveAll(item => item == null);
+            _AllEnemiesDrones.RemoveAll(item => item == null);
 
-            if (_AllEnemies.Count > 0)
+            if (_AllEnemiesTurrets.Count > 0)
             {
-                target.Value = _AllEnemies[0].transform;
+                target.Value = _AllEnemiesTurrets[0].transform;
+            }
+            else if (_AllEnemiesDrones.Count > 0)
+            {
+                target.Value = _AllEnemiesDrones[0].transform;
             }
             else
             {
