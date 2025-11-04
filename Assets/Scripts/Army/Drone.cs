@@ -32,6 +32,7 @@ public class Drone : ArmyElement,IShoot
 
 	new public void Die()
 	{
+		//TODO: Add death damage
 		ArmyManager.ArmyElementHasBeenKilled(gameObject);
 		Destroy(gameObject);
 	}
