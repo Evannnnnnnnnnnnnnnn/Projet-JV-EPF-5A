@@ -30,7 +30,7 @@ public class Drone : ArmyElement,IShoot
 		}
 	}
 
-	public void Die()
+	new public void Die()
 	{
 		ArmyManager.ArmyElementHasBeenKilled(gameObject);
 		Destroy(gameObject);
