@@ -7,6 +7,8 @@ public class RaycastBullet : MonoBehaviour
 {
 	//[SerializeField] LayerMask m_TargetLayer;
 	[SerializeField] float m_DamagePoints;
+	[SerializeField] GameObject m_ImpactMarkerPrefab;  // Le prefab du marqueur d'impact
+	[SerializeField] float m_MarkerDuration = 10f;     // Durée de vie du marqueur en secondes
 
 	Transform m_Transform;
 
@@ -27,6 +29,13 @@ public class RaycastBullet : MonoBehaviour
 				GameObject hitGO = hit.transform.gameObject;
 
 				ExplosionManager.Instance.SpawnExplosionOnObject(m_Transform.position, m_Transform.forward, hitGO, ExplosionSize.small);
+
+				// Si le projectile est vert, créer un marqueur au point d'impact
+				if (gameObject.CompareTag("Green") && m_ImpactMarkerPrefab != null)
+				{
+					GameObject marker = Instantiate(m_ImpactMarkerPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+					Destroy(marker, m_MarkerDuration);
+				}
 
 				hitGO.GetComponentInChildren<Health>()?.InflictDamage(m_DamagePoints);
 				break;
