@@ -31,9 +31,6 @@ public class FlyingDrone : ArmyElement,IShoot
 		}
 	}
 
-<<<<<<< Updated upstream
-	public void Die()
-=======
 	// Aim precisely at a world-space target position when shooting.
 	public void ShootAt(Vector3 targetWorldPosition)
 	{
@@ -48,7 +45,6 @@ public class FlyingDrone : ArmyElement,IShoot
 	}
 
 	new public void Die()
->>>>>>> Stashed changes
 	{
 		ArmyManager.ArmyElementHasBeenKilled(gameObject);
 		Destroy(gameObject);
