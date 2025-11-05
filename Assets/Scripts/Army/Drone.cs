@@ -30,9 +30,44 @@ public class Drone : ArmyElement,IShoot
 		}
 	}
 
+	[SerializeField] float m_DeathDamage = 10f;
+	[SerializeField] float m_DeathDamageRadius = 5f;
+
+
+	public bool IsTestDrone = false;
+
+	void Update()
+	{
+		if (IsTestDrone && Input.GetKeyDown(KeyCode.K))
+		{
+			Die();
+		}
+	}
+
+	private bool isDying = false;
+
+	private Collider[] colliders = new Collider[32];
+
 	new public void Die()
 	{
+		if (isDying) return;
+		isDying = true;
+
 		//TODO: Add death damage
+		        ExplosionManager.Instance.SpawnExplosionOnObject(m_Transform.position, m_Transform.forward, null, ExplosionSize.medium);
+		int numColliders = Physics.OverlapSphereNonAlloc(m_Transform.position, m_DeathDamageRadius, colliders);
+		for (int i = 0; i < numColliders; i++)
+		{
+			Collider collider = colliders[i];
+			if (collider.gameObject != gameObject && !collider.CompareTag(gameObject.tag))
+			{
+				Health health = collider.GetComponentInChildren<Health>();
+				if (health != null)
+				{
+					health.InflictDamage(m_DeathDamage);
+				}
+			}
+		}
 		ArmyManager.ArmyElementHasBeenKilled(gameObject);
 		Destroy(gameObject);
 	}
