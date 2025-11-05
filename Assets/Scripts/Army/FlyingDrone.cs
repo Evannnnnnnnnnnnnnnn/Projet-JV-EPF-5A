@@ -31,7 +31,24 @@ public class FlyingDrone : ArmyElement,IShoot
 		}
 	}
 
+<<<<<<< Updated upstream
+	public void Die()
+=======
+	// Aim precisely at a world-space target position when shooting.
+	public void ShootAt(Vector3 targetWorldPosition)
+	{
+		for (int i = 0; i < m_BulletSpawnPos.Length; i++)
+		{
+			Transform bulletSpawnPos = m_BulletSpawnPos[i];
+			Vector3 aimDir = (targetWorldPosition - bulletSpawnPos.position).normalized;
+			if (aimDir.sqrMagnitude < 0.0001f) aimDir = bulletSpawnPos.forward;
+			GameObject newBulletGO = Instantiate(m_BulletPrefab, bulletSpawnPos.position, Quaternion.LookRotation(aimDir, Vector3.up));
+			newBulletGO.tag = gameObject.tag;
+		}
+	}
+
 	new public void Die()
+>>>>>>> Stashed changes
 	{
 		ArmyManager.ArmyElementHasBeenKilled(gameObject);
 		Destroy(gameObject);
