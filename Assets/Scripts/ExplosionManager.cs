@@ -12,7 +12,22 @@ public class ExplosionManager : MonoBehaviour
     [SerializeField] float m_ExplosionOffsetDistance;
 
     static ExplosionManager m_Instance;
-    public static ExplosionManager Instance { get { return m_Instance; } }
+    public static ExplosionManager Instance
+    {
+        get
+        {
+            if (m_Instance == null)
+            {
+                m_Instance = FindObjectOfType<ExplosionManager>();
+                if (m_Instance == null)
+                {
+                    GameObject singleton = new GameObject("ExplosionManager");
+                    m_Instance = singleton.AddComponent<ExplosionManager>();
+                }
+            }
+            return m_Instance;
+        }
+    }
 
     private void Awake()
 	{
@@ -20,23 +35,26 @@ public class ExplosionManager : MonoBehaviour
         else Destroy(this);
 	}
 
-    public void SpawnExplosionOnObject(Vector3 pos,Vector3 dir, GameObject go,ExplosionSize size = ExplosionSize.medium)
-	{
-        Collider col = go.GetComponentInChildren<Collider>();
-        if (col)
+    public void SpawnExplosionOnObject(Vector3 pos, Vector3 dir, GameObject go, ExplosionSize size = ExplosionSize.medium)
+    {
+        if (go != null)
         {
-            Vector3 rayOrigin = pos - dir * 2;
-            Ray ray = new Ray(rayOrigin, dir);
-
-            RaycastHit hit;
-            if (col.Raycast(ray, out hit, float.PositiveInfinity))
+            Collider col = go.GetComponentInChildren<Collider>();
+            if (col)
             {
-                pos = hit.point;
+                Vector3 rayOrigin = pos - dir * 2;
+                Ray ray = new Ray(rayOrigin, dir);
+
+                RaycastHit hit;
+                if (col.Raycast(ray, out hit, float.PositiveInfinity))
+                {
+                    pos = hit.point;
+                }
             }
         }
 
-        GameObject newExplosionGO = Instantiate(m_ExplosionPrefabs[(int)size], pos- m_ExplosionOffsetDistance*dir, Quaternion.identity);
+        GameObject newExplosionGO = Instantiate(m_ExplosionPrefabs[(int)size], pos - m_ExplosionOffsetDistance * dir, Quaternion.identity);
         Destroy(newExplosionGO, m_ExplosionLifeDuration);
-	}
+    }
 
 }
