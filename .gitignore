@@ -34,7 +34,6 @@
 # Visual Studio cache directory
 .vs/
 .vscode
-
 .vsconfig
 
 # Gradle cache directory
@@ -100,5 +99,3 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
-
-ProjectSettings/
