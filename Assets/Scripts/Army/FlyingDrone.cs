@@ -20,13 +20,18 @@ public class FlyingDrone : ArmyElement,IShoot
 		m_Transform = transform;
 	}
 
+
 	public void Shoot()
 	{
 		//Debug.Break();
-		for (int i =0; i < m_BulletSpawnPos.Length; i++)
+		for (int i = 0; i < m_BulletSpawnPos.Length; i++)
 		{
 			Transform bulletSpawnPos = m_BulletSpawnPos[i];
-			GameObject newBulletGO = Instantiate(m_BulletPrefab, bulletSpawnPos.position, Quaternion.LookRotation(bulletSpawnPos.forward,Vector3.up));
+			// Oriente le drone vers la direction de tir
+			Vector3 shootDir = bulletSpawnPos.forward;
+			if (shootDir.sqrMagnitude > 0.0001f)
+				m_Transform.rotation = Quaternion.LookRotation(shootDir, Vector3.up);
+			GameObject newBulletGO = Instantiate(m_BulletPrefab, bulletSpawnPos.position, Quaternion.LookRotation(shootDir, Vector3.up));
 			newBulletGO.tag = gameObject.tag;
 		}
 	}
@@ -39,6 +44,8 @@ public class FlyingDrone : ArmyElement,IShoot
 			Transform bulletSpawnPos = m_BulletSpawnPos[i];
 			Vector3 aimDir = (targetWorldPosition - bulletSpawnPos.position).normalized;
 			if (aimDir.sqrMagnitude < 0.0001f) aimDir = bulletSpawnPos.forward;
+			// Oriente le drone vers la cible
+			m_Transform.rotation = Quaternion.LookRotation(aimDir, Vector3.up);
 			GameObject newBulletGO = Instantiate(m_BulletPrefab, bulletSpawnPos.position, Quaternion.LookRotation(aimDir, Vector3.up));
 			newBulletGO.tag = gameObject.tag;
 		}
@@ -53,8 +60,16 @@ public class FlyingDrone : ArmyElement,IShoot
 	// Public API to command movement for flying drones
 	public void CommandMoveTo(Vector3 destination, float speed = -1f)
 	{
+		// Clamp la destination dans les limites du monde (si DangerMapManager existe)
+		var dangerMap = GameObject.FindObjectOfType<DangerMapManager>();
+		if (dangerMap != null)
+		{
+			float half = dangerMap.worldSize * 0.5f;
+			destination.x = Mathf.Clamp(destination.x, -half, half);
+			destination.z = Mathf.Clamp(destination.z, -half, half);
+		}
 		if (m_MoveCoroutine != null) StopCoroutine(m_MoveCoroutine);
-		float useSpeed = speed >0 ? speed : m_MoveSpeed;
+		float useSpeed = speed > 0 ? speed : m_MoveSpeed;
 		m_MoveCoroutine = StartCoroutine(MoveToCoroutine(destination, useSpeed));
 	}
 
@@ -85,8 +100,15 @@ public class FlyingDrone : ArmyElement,IShoot
 
 	IEnumerator MoveToCoroutine(Vector3 destination, float speed)
 	{
-		while ((transform.position - destination).sqrMagnitude >0.01f)
+		while ((transform.position - destination).sqrMagnitude > 0.01f)
 		{
+			Vector3 moveDir = (destination - transform.position).normalized;
+			if (moveDir.sqrMagnitude > 0.0001f)
+			{
+				// Rotation progressive (slerp) pour plus de naturel
+				Quaternion targetRot = Quaternion.LookRotation(moveDir, Vector3.up);
+				m_Transform.rotation = Quaternion.Slerp(m_Transform.rotation, targetRot, 0.2f);
+			}
 			transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
 			yield return null;
 		}

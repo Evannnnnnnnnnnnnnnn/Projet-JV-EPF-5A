@@ -47,16 +47,24 @@ public class Rocket : MonoBehaviour
             elapsedTime += Time.fixedDeltaTime;
         }
 
+        // Ajout DangerMapManager : zone de danger à l'impact
+        var dangerMap = GameObject.FindObjectOfType<DangerMapManager>();
+        if (dangerMap != null)
+        {
+            // Paramètres : position, rayon, intensité, durée (exemple : 1.0f, 3s)
+            dangerMap.RegisterMortarShot(m_Transform.position, m_DamageRadius, 1.0f, 3.0f);
+        }
+
         Destroy(gameObject);
         ExplosionManager.Instance.SpawnExplosionOnObject(m_Transform.position, m_Transform.forward, TerrainManager.Instance.TerrainGO,ExplosionSize.big);
 
         //inflict damage to nearby enemies
         Collider[] hitColliders = Physics.OverlapSphere(endPos, m_DamageRadius);
-		foreach (var item in hitColliders)
-		{
+        foreach (var item in hitColliders)
+        {
             if (!item.gameObject.CompareTag(gameObject.tag))
                 item.GetComponentInChildren<Health>()?.InflictDamage(m_DamagePoints);
-		}
+        }
     }
 
 	//private void OnTriggerEnter(Collider other)

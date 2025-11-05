@@ -94,6 +94,14 @@ public class FlyingDroneShoot : Action
 			foreach (var h in heights)
 			{
 				Vector3 candidate = currentPos + lateralDir * d + Vector3.up * h;
+				// Clamp la position candidate dans les limites du monde (si DangerMapManager existe)
+				var dangerMap = GameObject.FindObjectOfType<DangerMapManager>();
+				if (dangerMap != null)
+				{
+					float half = dangerMap.worldSize * 0.5f;
+					candidate.x = Mathf.Clamp(candidate.x, -half, half);
+					candidate.z = Mathf.Clamp(candidate.z, -half, half);
+				}
 
 				// don't pick a candidate inside a collider
 				Collider[] coll = Physics.OverlapSphere(candidate, clearanceRadius);
