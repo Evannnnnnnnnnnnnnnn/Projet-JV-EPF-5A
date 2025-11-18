@@ -45,14 +45,14 @@ public class REDDronesSelectEnemy : Action
             _AllEnemiesTurrets.RemoveAll(item => item == null);
             _AllEnemiesDrones.RemoveAll(item => item == null);
 
-            if (_AllEnemiesTurrets.Count > 0)
-            {
-                target.Value = _AllEnemiesTurrets[^1].transform;
-            }
-
-            else if (_AllEnemiesDrones.Count > 0)
+            if (_AllEnemiesDrones.Count > 0)
             {
                 target.Value = _AllEnemiesDrones[0].transform;
+            }
+
+            else if (_AllEnemiesTurrets.Count > 0)
+            {
+                target.Value = _AllEnemiesTurrets[0].transform;
             }
 
             else

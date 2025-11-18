@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 [TaskCategory("MyTasks")]
 [TaskDescription("Select non targeted enemy Drone")]
@@ -15,10 +16,17 @@ public class REDTurretsSelectEnemy : Action
     List<ArmyElement> _AllEnemiesTurrets;
     List<ArmyElement> _AllEnemiesDrones;
     bool _isInitialized = false; // Renommé pour plus de clarté
+    bool _isEven;
+
+    private static int _nextTurretId = 0;
+    private int _myTurretId;
+
 
     public override void OnAwake()
     {
         m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
+        _myTurretId = System.Threading.Interlocked.Increment(ref _nextTurretId);
+        _isEven = (_myTurretId % 2 == 0);
     }
 
     public override TaskStatus OnUpdate()
@@ -35,7 +43,6 @@ public class REDTurretsSelectEnemy : Action
         {
             _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
             _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
-
             _isInitialized = true; // On marque comme initialisé
         }
 
@@ -45,14 +52,18 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesDrones.RemoveAll(item => item == null);
 
 
-            if (_AllEnemiesTurrets.Count > 7)
+            if (_AllEnemiesTurrets.Count > 0)
             {
-                target.Value = _AllEnemiesTurrets[5].transform;
+                if (_isEven)
+                {
+                    target.Value = _AllEnemiesTurrets[1].transform;
+                }
+                else
+                {
+                    target.Value = _AllEnemiesTurrets[1].transform;
+                }
             }
-            else if (_AllEnemiesTurrets.Count > 0)
-            {
-                target.Value = _AllEnemiesTurrets[0].transform;
-            }
+
             else if (_AllEnemiesDrones.Count > 0)
             {
                 target.Value = _AllEnemiesDrones[0].transform;
