@@ -31,6 +31,7 @@ public class REDTurretsSelectEnemy : Action
 
     public override TaskStatus OnUpdate()
     {
+
         // Tant que la référence n'est pas injectée par ArmyManager, on attend.
         if (m_ArmyElement.ArmyManager == null)
         {
@@ -45,48 +46,46 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
             _isInitialized = true; // On marque comme initialisé
         }
-
-        if (target.Value == null)
+        else
         {
             _AllEnemiesTurrets.RemoveAll(item => item == null);
             _AllEnemiesDrones.RemoveAll(item => item == null);
+        }
 
+        if (_AllEnemiesTurrets.Count == 9)
+        {
+            GameObject targetGameObject = new GameObject("FixedTarget");
+            targetGameObject.transform.position = new Vector3(-24, 3, 0);
+            target.Value = targetGameObject.transform;
+        }
 
-            if (_AllEnemiesTurrets.Count == 9)
-            {
-                GameObject targetGameObject = new GameObject("FixedTarget");
-                targetGameObject.transform.position = new Vector3(-24, 3, 0);
-                target.Value = targetGameObject.transform;
-            }
+        else if (_AllEnemiesTurrets.Count == 6)
+        {
+            GameObject targetGameObject = new GameObject("FixedTarget");
+            targetGameObject.transform.position = new Vector3(-22, 6, 12);
+            target.Value = targetGameObject.transform;
+        }
 
-            else if (_AllEnemiesTurrets.Count == 6)
-            {
-                GameObject targetGameObject = new GameObject("FixedTarget");
-                targetGameObject.transform.position = new Vector3(-23, 6, 11);
-                target.Value = targetGameObject.transform;
-            }
+        else if (_AllEnemiesTurrets.Count > 0)
+        {
+            // if (_isEven)
+            // {
+            target.Value = _AllEnemiesTurrets[0].transform;
+            // }
+            // else
+            // {
+            //     target.Value = _AllEnemiesTurrets[^1].transform;
+            // }
+        }
 
-            else if (_AllEnemiesTurrets.Count > 0)
-            {
-                if (_isEven)
-                {
-                    target.Value = _AllEnemiesTurrets[0].transform;
-                }
-                // else
-                // {
-                //     target.Value = _AllEnemiesTurrets[^1].transform;
-                // }
-            }
+        else if (_AllEnemiesDrones.Count > 0)
+        {
+            target.Value = _AllEnemiesDrones[0].transform;
+        }
 
-            else if (_AllEnemiesDrones.Count > 0)
-            {
-                target.Value = _AllEnemiesDrones[0].transform;
-            }
-
-            else
-            {
-                return TaskStatus.Failure;
-            }
+        else
+        {
+            return TaskStatus.Failure;
         }
 
         return TaskStatus.Success;
