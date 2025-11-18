@@ -51,22 +51,41 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesTurrets.RemoveAll(item => item == null);
             _AllEnemiesDrones.RemoveAll(item => item == null);
 
+            var turretsInRange = _AllEnemiesTurrets.Where(item => {
+                if (maxRadius.Value <= 0f) return true; // No range limit if maxRadius is 0 or less
+                float dist = Vector3.Distance(transform.position, item.transform.position);
+                return dist > minRadius.Value && dist < maxRadius.Value;
+            }).ToList();
+            
+            var dronesInRange = _AllEnemiesDrones.Where(item => {
+                if (maxRadius.Value <= 0f) return true; // No range limit if maxRadius is 0 or less
+                float dist = Vector3.Distance(transform.position, item.transform.position);
+                return dist > minRadius.Value && dist < maxRadius.Value;
+            }).ToList();
 
-            if (_AllEnemiesTurrets.Count > 0)
+
+            if (turretsInRange.Count > 0)
             {
                 if (_isEven)
                 {
-                    target.Value = _AllEnemiesTurrets[1].transform;
+                    target.Value = turretsInRange[0].transform;
                 }
                 else
                 {
-                    target.Value = _AllEnemiesTurrets[1].transform;
+                    if (turretsInRange.Count > 1)
+                    {
+                        target.Value = turretsInRange[^1].transform;
+                    }
+                    else
+                    {
+                        target.Value = turretsInRange[0].transform;
+                    }
                 }
             }
 
-            else if (_AllEnemiesDrones.Count > 0)
+            else if (dronesInRange.Count > 0)
             {
-                target.Value = _AllEnemiesDrones[0].transform;
+                target.Value = dronesInRange[0].transform;
             }
 
             else
