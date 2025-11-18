@@ -52,9 +52,18 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesDrones.RemoveAll(item => item == null);
 
 
-            if (_AllEnemiesTurrets.Count > 7)
+            if (_AllEnemiesTurrets.Count == 9)
             {
-                target.Value = _AllEnemiesTurrets[2].transform; //TODO Fixer pour TurretGreen (2)   
+                GameObject targetGameObject = new GameObject("FixedTarget");
+                targetGameObject.transform.position = new Vector3(-24, 3, 0);
+                target.Value = targetGameObject.transform;
+            }
+
+            else if (_AllEnemiesTurrets.Count == 6)
+            {
+                GameObject targetGameObject = new GameObject("FixedTarget");
+                targetGameObject.transform.position = new Vector3(-23, 6, 11);
+                target.Value = targetGameObject.transform;
             }
 
             else if (_AllEnemiesTurrets.Count > 0)
@@ -63,10 +72,10 @@ public class REDTurretsSelectEnemy : Action
                 {
                     target.Value = _AllEnemiesTurrets[0].transform;
                 }
-                else
-                {
-                    target.Value = _AllEnemiesTurrets[^1].transform;
-                }
+                // else
+                // {
+                //     target.Value = _AllEnemiesTurrets[^1].transform;
+                // }
             }
 
             else if (_AllEnemiesDrones.Count > 0)
