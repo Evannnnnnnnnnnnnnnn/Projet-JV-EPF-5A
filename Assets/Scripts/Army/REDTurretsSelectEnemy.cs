@@ -51,6 +51,7 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesTurrets.RemoveAll(item => item == null);
             _AllEnemiesDrones.RemoveAll(item => item == null);
 
+            // Filter by range
             var turretsInRange = _AllEnemiesTurrets.Where(item => {
                 if (maxRadius.Value <= 0f) return true; // No range limit if maxRadius is 0 or less
                 float dist = Vector3.Distance(transform.position, item.transform.position);
@@ -63,29 +64,50 @@ public class REDTurretsSelectEnemy : Action
                 return dist > minRadius.Value && dist < maxRadius.Value;
             }).ToList();
 
+            // Filter by Line of Sight (LoS)
+            var turretsWithLoS = turretsInRange.Where(item => {
+                Vector3 direction = (item.transform.position - transform.position).normalized;
+                RaycastHit hit;
+                float distance = Vector3.Distance(transform.position, item.transform.position);
+                if (Physics.Raycast(transform.position, direction, out hit, distance + 0.1f)) {
+                    return hit.transform == item.transform;
+                }
+                return false;
+            }).ToList();
 
-            if (turretsInRange.Count > 0)
+            var dronesWithLoS = dronesInRange.Where(item => {
+                Vector3 direction = (item.transform.position - transform.position).normalized;
+                RaycastHit hit;
+                float distance = Vector3.Distance(transform.position, item.transform.position);
+                if (Physics.Raycast(transform.position, direction, out hit, distance + 0.1f)) {
+                    return hit.transform == item.transform;
+                }
+                return false;
+            }).ToList();
+
+
+                if (turretsWithLoS.Count > 0)
             {
                 if (_isEven)
                 {
-                    target.Value = turretsInRange[0].transform;
+                    target.Value = turretsWithLoS[0].transform;
                 }
                 else
                 {
-                    if (turretsInRange.Count > 1)
+                    if (turretsWithLoS.Count > 1)
                     {
-                        target.Value = turretsInRange[^1].transform;
+                        target.Value = turretsWithLoS[1].transform;
                     }
                     else
                     {
-                        target.Value = turretsInRange[0].transform;
+                        target.Value = turretsWithLoS[0].transform;
                     }
                 }
             }
 
-            else if (dronesInRange.Count > 0)
+            else if (dronesWithLoS.Count > 0)
             {
-                target.Value = dronesInRange[0].transform;
+                target.Value = dronesWithLoS[0].transform;
             }
 
             else
