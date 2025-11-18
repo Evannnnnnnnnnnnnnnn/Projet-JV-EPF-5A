@@ -51,63 +51,27 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesTurrets.RemoveAll(item => item == null);
             _AllEnemiesDrones.RemoveAll(item => item == null);
 
-            // Filter by range
-            var turretsInRange = _AllEnemiesTurrets.Where(item => {
-                if (maxRadius.Value <= 0f) return true; // No range limit if maxRadius is 0 or less
-                float dist = Vector3.Distance(transform.position, item.transform.position);
-                return dist > minRadius.Value && dist < maxRadius.Value;
-            }).ToList();
-            
-            var dronesInRange = _AllEnemiesDrones.Where(item => {
-                if (maxRadius.Value <= 0f) return true; // No range limit if maxRadius is 0 or less
-                float dist = Vector3.Distance(transform.position, item.transform.position);
-                return dist > minRadius.Value && dist < maxRadius.Value;
-            }).ToList();
 
-            // Filter by Line of Sight (LoS)
-            var turretsWithLoS = turretsInRange.Where(item => {
-                Vector3 direction = (item.transform.position - transform.position).normalized;
-                RaycastHit hit;
-                float distance = Vector3.Distance(transform.position, item.transform.position);
-                if (Physics.Raycast(transform.position, direction, out hit, distance + 0.1f)) {
-                    return hit.transform == item.transform;
-                }
-                return false;
-            }).ToList();
+            if (_AllEnemiesTurrets.Count > 7)
+            {
+                target.Value = _AllEnemiesTurrets[2].transform; //TODO Fixer pour TurretGreen (2)   
+            }
 
-            var dronesWithLoS = dronesInRange.Where(item => {
-                Vector3 direction = (item.transform.position - transform.position).normalized;
-                RaycastHit hit;
-                float distance = Vector3.Distance(transform.position, item.transform.position);
-                if (Physics.Raycast(transform.position, direction, out hit, distance + 0.1f)) {
-                    return hit.transform == item.transform;
-                }
-                return false;
-            }).ToList();
-
-
-                if (turretsWithLoS.Count > 0)
+            else if (_AllEnemiesTurrets.Count > 0)
             {
                 if (_isEven)
                 {
-                    target.Value = turretsWithLoS[0].transform;
+                    target.Value = _AllEnemiesTurrets[0].transform;
                 }
                 else
                 {
-                    if (turretsWithLoS.Count > 1)
-                    {
-                        target.Value = turretsWithLoS[1].transform;
-                    }
-                    else
-                    {
-                        target.Value = turretsWithLoS[0].transform;
-                    }
+                    target.Value = _AllEnemiesTurrets[^1].transform;
                 }
             }
 
-            else if (dronesWithLoS.Count > 0)
+            else if (_AllEnemiesDrones.Count > 0)
             {
-                target.Value = dronesWithLoS[0].transform;
+                target.Value = _AllEnemiesDrones[0].transform;
             }
 
             else
