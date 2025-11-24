@@ -47,7 +47,7 @@ public class REDDronesSelectEnemy : Action
         if (!_isInitialized)
         {
             _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
-            _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
+            _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(true);
 
             first_target = _AllEnemiesTurrets[7];//TODO fixer à TurretGreen (1)
             second_target = _AllEnemiesTurrets[5];//TODO fixer à DroneGreen (2)

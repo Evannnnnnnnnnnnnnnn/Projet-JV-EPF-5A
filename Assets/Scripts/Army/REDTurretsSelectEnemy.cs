@@ -17,6 +17,9 @@ public class REDTurretsSelectEnemy : Action
     List<ArmyElement> _AllEnemiesDrones;
     bool _isInitialized = false;
     bool _isEven;
+    int firstMissiles = 6;
+
+    ArmyElement lastTurret;
 
     private static int _nextTurretId = 0;
     private int _myTurretId;
@@ -43,7 +46,6 @@ public class REDTurretsSelectEnemy : Action
 
     public override TaskStatus OnUpdate()
     {
-
         int nbMissile = GetMissileCount();
 
         // Tant que la référence n'est pas injectée par ArmyManager, on attend.
@@ -58,6 +60,8 @@ public class REDTurretsSelectEnemy : Action
         {
             _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
             _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
+
+            lastTurret = _AllEnemiesTurrets[0];//TODO fixer à TurretGreen (6)
             
             _isInitialized = true;
         }
@@ -67,34 +71,30 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesDrones.RemoveAll(item => item == null);
         }
 
+        if (nbMissile < firstMissiles)
+        {
+            GameObject targetGameObject = new GameObject("FixedTarget");
+            targetGameObject.transform.position = new Vector3(9, 1, -2 + _myTurretId * 1 -5);
+            target.Value = targetGameObject.transform;
+        } 
 
-        if (_AllEnemiesTurrets.Count == 9 && nbMissile <= 9) //normalement il faut 10 missiles, mais ça marche avec 9
+        else if (_AllEnemiesTurrets.Count == 9 && nbMissile <= (9 + firstMissiles)) //normalement il faut 10 missiles, mais ça marche avec 9
         {
             GameObject targetGameObject = new GameObject("FixedTarget");
             targetGameObject.transform.position = new Vector3(-24, 3, 0);
             target.Value = targetGameObject.transform;
         }
 
-        else if (nbMissile > 9 && nbMissile <= 19)
+        else if (nbMissile > (9 + firstMissiles) && nbMissile <= (19 + firstMissiles))
         {
             GameObject targetGameObject = new GameObject("FixedTarget");
             targetGameObject.transform.position = new Vector3(-22, 6, 12);
             target.Value = targetGameObject.transform;
         }
 
-        else if (nbMissile > 19 && nbMissile <= 29)
+        else if (nbMissile > (19 + firstMissiles) && nbMissile <= 30 + firstMissiles)
         {
-            target.Value = _AllEnemiesTurrets[0].transform;
-        }
-
-        else if (_AllEnemiesTurrets.Count > 0 && nbMissile > 29 && nbMissile <= 40)
-        {
-            target.Value = _AllEnemiesTurrets[^1].transform;
-        }
-
-        else if (_AllEnemiesTurrets.Count > 0)
-        {
-            target.Value = _AllEnemiesTurrets[0].transform;
+            target.Value = lastTurret.transform;
         }
 
 
