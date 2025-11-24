@@ -24,6 +24,7 @@ public class REDDronesSelectEnemy : Action
     ArmyElement first_target;
     ArmyElement second_target;
     ArmyElement third_target;
+    ArmyElement last_target;
 
 
     public override void OnAwake()
@@ -50,7 +51,8 @@ public class REDDronesSelectEnemy : Action
 
             first_target = _AllEnemiesTurrets[7];//TODO fixer à TurretGreen (1)
             second_target = _AllEnemiesTurrets[5];//TODO fixer à DroneGreen (2)
-            third_target = _AllEnemiesTurrets[6];//TODO fixer à DroneRed (3)
+            third_target = _AllEnemiesTurrets[6];//TODO fixer à DroneRed (8)
+            last_target = _AllEnemiesTurrets[3];//TODO fixer à TurretRed (3)
 
             _isInitialized = true;
         }
@@ -73,7 +75,10 @@ public class REDDronesSelectEnemy : Action
             {
                 target.Value = third_target.transform;
             }
-
+            else if (last_target != null && _myDroneId % 2 == 0)
+            {
+                target.Value = last_target.transform;
+            }
             else if (_AllEnemiesDrones.Count > 0)
             {
                 target.Value = _AllEnemiesDrones[0].transform;

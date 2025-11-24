@@ -82,17 +82,21 @@ public class REDTurretsSelectEnemy : Action
             target.Value = targetGameObject.transform;
         }
 
+        else if (nbMissile > 19 && nbMissile <= 29)
+        {
+            target.Value = _AllEnemiesTurrets[0].transform;
+        }
+
+        else if (_AllEnemiesTurrets.Count > 0 && nbMissile > 29 && nbMissile <= 40)
+        {
+            target.Value = _AllEnemiesTurrets[^1].transform;
+        }
+
         else if (_AllEnemiesTurrets.Count > 0)
         {
-            // if (_isEven)
-            // {
             target.Value = _AllEnemiesTurrets[0].transform;
-            // }
-            // else
-            // {
-            //     target.Value = _AllEnemiesTurrets[^1].transform;
-            // }
         }
+
 
         else if (_AllEnemiesDrones.Count > 0)
         {
