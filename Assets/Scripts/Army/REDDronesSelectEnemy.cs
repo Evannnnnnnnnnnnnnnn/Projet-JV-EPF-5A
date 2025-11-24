@@ -14,12 +14,23 @@ public class REDDronesSelectEnemy : Action
     public SharedFloat maxRadius;
     List<ArmyElement> _AllEnemiesTurrets;
     List<ArmyElement> _AllEnemiesDrones;
+    bool _isInitialized = false;
+    bool _isEven;
 
-    bool _isInitialized = false; // Renommé pour plus de clarté
+    private static int _nextDroneId = 0;
+    private int _myDroneId;
+
+
+    ArmyElement first_target;
+    ArmyElement second_target;
+    ArmyElement third_target;
+
 
     public override void OnAwake()
     {
         m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
+        _myDroneId = System.Threading.Interlocked.Increment(ref _nextDroneId);
+        _isEven = _myDroneId % 2 == 0;
     }
 
     public override TaskStatus OnUpdate()
@@ -37,7 +48,11 @@ public class REDDronesSelectEnemy : Action
             _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
             _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
 
-            _isInitialized = true; // On marque comme initialisé
+            first_target = _AllEnemiesTurrets[7];//TODO fixer à TurretGreen (1)
+            second_target = _AllEnemiesTurrets[5];//TODO fixer à DroneGreen (2)
+            third_target = _AllEnemiesTurrets[6];//TODO fixer à DroneRed (3)
+
+            _isInitialized = true;
         }
 
         if (target.Value == null)
@@ -45,16 +60,28 @@ public class REDDronesSelectEnemy : Action
             _AllEnemiesTurrets.RemoveAll(item => item == null);
             _AllEnemiesDrones.RemoveAll(item => item == null);
 
-            if (_AllEnemiesDrones.Count > 0)
+            
+            if (_myDroneId % 3 == 0 && first_target != null)
+            {
+                target.Value = first_target.transform;
+            }
+            else if (_myDroneId % 3 == 1 && second_target != null)
+            {
+                target.Value = second_target.transform;
+            }
+            else if (_myDroneId % 3 == 2 && third_target != null)
+            {
+                target.Value = third_target.transform;
+            }
+
+            else if (_AllEnemiesDrones.Count > 0)
             {
                 target.Value = _AllEnemiesDrones[0].transform;
             }
-
             else if (_AllEnemiesTurrets.Count > 0)
             {
                 target.Value = _AllEnemiesTurrets[0].transform;
             }
-
             else
             {
                 return TaskStatus.Failure;

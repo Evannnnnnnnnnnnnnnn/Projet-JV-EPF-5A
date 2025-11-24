@@ -15,26 +15,19 @@ public class REDTurretsSelectEnemy : Action
     public SharedFloat maxRadius;
     List<ArmyElement> _AllEnemiesTurrets;
     List<ArmyElement> _AllEnemiesDrones;
-    bool _isInitialized = false; // Renommé pour plus de clarté
+    bool _isInitialized = false;
     bool _isEven;
 
     private static int _nextTurretId = 0;
     private int _myTurretId;
 
-    // Missile counter for red turrets
     private static int _missileFiredCount = 0;
 
-    /// <summary>
-    /// Increments the missile fired count for red turrets.
-    /// </summary>
     public static void IncrementMissileCount()
     {
         _missileFiredCount++;
     }
 
-    /// <summary>
-    /// Gets the current missile fired count for red turrets.
-    /// </summary>
     public static int GetMissileCount()
     {
         return _missileFiredCount;
@@ -45,7 +38,7 @@ public class REDTurretsSelectEnemy : Action
     {
         m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
         _myTurretId = System.Threading.Interlocked.Increment(ref _nextTurretId);
-        _isEven = (_myTurretId % 2 == 0);
+        _isEven = _myTurretId % 2 == 0;
     }
 
     public override TaskStatus OnUpdate()
@@ -65,13 +58,15 @@ public class REDTurretsSelectEnemy : Action
         {
             _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
             _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
-            _isInitialized = true; // On marque comme initialisé
+            
+            _isInitialized = true;
         }
         else
         {
             _AllEnemiesTurrets.RemoveAll(item => item == null);
             _AllEnemiesDrones.RemoveAll(item => item == null);
         }
+
 
         if (_AllEnemiesTurrets.Count == 9 && nbMissile <= 9) //normalement il faut 10 missiles, mais ça marche avec 9
         {
@@ -114,25 +109,3 @@ public class REDTurretsSelectEnemy : Action
         return TaskStatus.Success;
     }
 }
-
-/*
-// Example of how to use the missile counter:
-public class MissileLauncher : MonoBehaviour
-{
-    void FireMissile()
-    {
-        // When a red turret fires a missile, call this:
-        REDTurretsSelectEnemy.IncrementMissileCount();
-        Debug.Log("Red turret missile fired! Total: " + REDTurretsSelectEnemy.GetMissileCount());
-    }
-
-    void Update()
-    {
-        // Example of checking the count
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            Debug.Log("Current Red Turret Missile Count: " + REDTurretsSelectEnemy.GetMissileCount());
-        }
-    }
-}
-*/
