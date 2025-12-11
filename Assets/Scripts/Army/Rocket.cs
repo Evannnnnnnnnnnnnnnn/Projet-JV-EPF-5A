@@ -8,7 +8,7 @@ public class Rocket : MonoBehaviour
     [SerializeField] float m_DamageRadius;
     [SerializeField] float m_DamagePoints;
 
-    Rigidbody m_Rigidbody;
+    public Rigidbody m_Rigidbody;
     Transform m_Transform;
 
     private void Awake()
