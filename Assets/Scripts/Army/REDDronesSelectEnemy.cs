@@ -4,7 +4,7 @@ using BehaviorDesigner.Runtime.Tasks;
 using System.Collections.Generic;
 
 [TaskCategory("MyTasks")]
-[TaskDescription("Select non targeted enemy Drone")]
+[TaskDescription("Select enemy turret first, then drone. Keep target until destroyed.")]
 
 public class REDDronesSelectEnemy : Action
 {
@@ -12,82 +12,94 @@ public class REDDronesSelectEnemy : Action
     public SharedTransform target;
     public SharedFloat minRadius;
     public SharedFloat maxRadius;
-    List<ArmyElement> _AllEnemiesTurrets;
-    List<ArmyElement> _AllEnemiesDrones;
-    bool _isInitialized = false;
-    bool _isEven;
-
-    private static int _nextDroneId = 0;
-    private int _myDroneId;
-
-
-    ArmyElement first_target;
-    ArmyElement second_target;
-    ArmyElement third_target;
-    ArmyElement last_target;
-
+    
+    // Cache des ennemis (mis à jour occasionnellement)
+    private List<ArmyElement> m_CachedEnemiesTurrets = new List<ArmyElement>();
+    private List<ArmyElement> m_CachedEnemiesDrones = new List<ArmyElement>();
+    private float m_LastCacheUpdateTime = -999f;
+    private const float CACHE_UPDATE_INTERVAL = 1f; // Mettre à jour le cache chaque seconde
 
     public override void OnAwake()
     {
         m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
-        _myDroneId = System.Threading.Interlocked.Increment(ref _nextDroneId);
-        _isEven = _myDroneId % 2 == 0;
+        // _myDroneId = System.Threading.Interlocked.Increment(ref _nextDroneId);
+        // _isEven = _myDroneId % 2 == 0;
     }
 
     public override TaskStatus OnUpdate()
     {
-        // Tant que la référence n'est pas injectée par ArmyManager, on attend.
+        // Tant que le ArmyManager n'est pas prêt, on attend
         if (m_ArmyElement.ArmyManager == null)
         {
-            // On retourne "Running" pour que la tâche continue d'essayer à la frame suivante
             return TaskStatus.Running;
         }
 
-        // On exécute cela seulement si le manager est prêt ET si on ne l'a pas déjà fait.
-        if (!_isInitialized)
+        // Si on a déjà une cible valide, la garder
+        if (target.Value != null)
         {
-            _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
-            _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(true);
-
-            first_target = _AllEnemiesTurrets.Find(turret => turret.name == "TurretGreen (1)");
-            second_target = _AllEnemiesTurrets.Find(turret => turret.name == "TurretGreen (2)");
-            third_target = _AllEnemiesTurrets.Find(turret => turret.name == "TurretGreen (8)");
-
-            _isInitialized = true;
+            return TaskStatus.Success;
         }
 
-        if (target.Value == null)
+        // Mettre à jour le cache occasionnellement
+        if (Time.time - m_LastCacheUpdateTime > CACHE_UPDATE_INTERVAL)
         {
-            _AllEnemiesTurrets.RemoveAll(item => item == null);
-            _AllEnemiesDrones.RemoveAll(item => item == null);
+            m_CachedEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
+            m_CachedEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
+            m_LastCacheUpdateTime = Time.time;
+        }
 
-            
-            if (_myDroneId % 3 == 0 && first_target != null)
+        Vector3 dronePosition = transform.position;
+
+        // 1. Chercher les TurretGreen (tag "2") dans le rayon
+        ArmyElement closestTurret = FindClosestEnemy(m_CachedEnemiesTurrets, dronePosition, "2");
+        if (closestTurret != null)
+        {
+            target.Value = closestTurret.transform;
+            Debug.Log($"[REDDronesSelectEnemy] ✓ {gameObject.name}: Cible TurretGreen = {target.Value.name}");
+            return TaskStatus.Success;
+        }
+
+        // 2. Si pas de turret, chercher les DroneGreen (tag "2") dans le rayon
+        ArmyElement closestDrone = FindClosestEnemy(m_CachedEnemiesDrones, dronePosition, "2");
+        if (closestDrone != null)
+        {
+            target.Value = closestDrone.transform;
+            Debug.Log($"[REDDronesSelectEnemy] ✓ {gameObject.name}: Cible DroneGreen = {target.Value.name}");
+            return TaskStatus.Success;
+        }
+
+        // 3. Aucune cible trouvée - retourner Running au lieu de Failure
+        Debug.Log($"[REDDronesSelectEnemy] {gameObject.name}: Pas de cible dans le rayon");
+        return TaskStatus.Running;
+    }
+
+    /// <summary>
+    /// Trouve l'ennemi le plus proche dans le rayon spécifié
+    /// </summary>
+    private ArmyElement FindClosestEnemy(List<ArmyElement> enemies, Vector3 dronePosition, string requiredTag)
+    {
+        ArmyElement closest = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (ArmyElement enemy in enemies)
+        {
+            // Vérifier que l'ennemi existe et a le bon tag
+            if (enemy == null || !enemy.gameObject.CompareTag(requiredTag))
+                continue;
+
+            // Vérifier la distance
+            float distance = Vector3.Distance(dronePosition, enemy.transform.position);
+            if (distance < minRadius.Value || distance > maxRadius.Value)
+                continue;
+
+            // Garder le plus proche
+            if (distance < closestDistance)
             {
-                target.Value = first_target.transform;
-            }
-            else if (_myDroneId % 3 == 1 && second_target != null)
-            {
-                target.Value = second_target.transform;
-            }
-            else if (_myDroneId % 3 == 2 && third_target != null)
-            {
-                target.Value = third_target.transform;
-            }
-            else if (_AllEnemiesDrones.Count > 0)
-            {
-                target.Value = _AllEnemiesDrones[0].transform;
-            }
-            else if (_AllEnemiesTurrets.Count > 0)
-            {
-                target.Value = _AllEnemiesTurrets[0].transform;
-            }
-            else
-            {
-                return TaskStatus.Failure;
+                closestDistance = distance;
+                closest = enemy;
             }
         }
 
-        return TaskStatus.Success;
+        return closest;
     }
 }
