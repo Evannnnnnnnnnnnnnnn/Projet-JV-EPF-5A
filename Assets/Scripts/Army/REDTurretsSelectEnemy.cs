@@ -61,7 +61,7 @@ public class REDTurretsSelectEnemy : Action
             _AllEnemiesTurrets = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Turret>(false);
             _AllEnemiesDrones = m_ArmyElement.ArmyManager.GetAllEnemiesOfType<Drone>(false);
 
-            lastTurret = _AllEnemiesTurrets[0];//TODO fixer à TurretGreen (6)
+            lastTurret = _AllEnemiesTurrets[4];//TODO fixer à TurretGreen (6)
             
             _isInitialized = true;
         }

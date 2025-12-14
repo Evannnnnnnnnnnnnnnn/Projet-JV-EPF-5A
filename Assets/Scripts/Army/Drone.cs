@@ -53,7 +53,6 @@ public class Drone : ArmyElement,IShoot
 		if (isDying) return;
 		isDying = true;
 
-		        //TODO: Add death damage
 		        if (gameObject.CompareTag("1"))
 		        {
 		            ExplosionManager.Instance.SpawnExplosionOnObject(m_Transform.position, m_Transform.forward, null, ExplosionSize.medium);
