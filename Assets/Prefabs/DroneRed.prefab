@@ -1351,6 +1351,6 @@ MonoBehaviour:
   m_MissileSpawnPos:
   - {fileID: 7376284243647085243}
   - {fileID: 7376284244114932892}
-  m_DeathDamage: 10
+  m_DeathDamage: 5
   m_DeathDamageRadius: 5
   IsKamikazeDrone: 1

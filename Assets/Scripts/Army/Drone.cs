@@ -52,11 +52,8 @@ public class Drone : ArmyElement,IShoot
 	{
 		if (isDying) return;
 		isDying = true;
-
-		        if (gameObject.CompareTag("1"))
-		        {
-		            ExplosionManager.Instance.SpawnExplosionOnObject(m_Transform.position, m_Transform.forward, null, ExplosionSize.medium);
-		        }		int numColliders = Physics.OverlapSphereNonAlloc(m_Transform.position, m_DeathDamageRadius, colliders);
+		ExplosionManager.Instance.SpawnExplosionOnObject(m_Transform.position, m_Transform.forward, null, ExplosionSize.medium);
+		int numColliders = Physics.OverlapSphereNonAlloc(m_Transform.position, m_DeathDamageRadius, colliders);
 		for (int i = 0; i < numColliders; i++)
 		{
 			Collider collider = colliders[i];
