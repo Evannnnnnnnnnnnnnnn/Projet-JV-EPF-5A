@@ -1353,4 +1353,4 @@ MonoBehaviour:
   - {fileID: 7376284244114932892}
   m_DeathDamage: 10
   m_DeathDamageRadius: 5
-  IsTestDrone: 1
+  IsKamikazeDrone: 1

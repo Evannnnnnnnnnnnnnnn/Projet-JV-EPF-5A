@@ -34,11 +34,11 @@ public class Drone : ArmyElement,IShoot
 	[SerializeField] float m_DeathDamageRadius = 5f;
 
 
-	public bool IsTestDrone = false;
+	public bool IsKamikazeDrone = false;
 
 	void Update()
 	{
-		if (IsTestDrone && Input.GetKeyDown(KeyCode.K))
+		if (IsKamikazeDrone && Input.GetKeyDown(KeyCode.K))
 		{
 			Die();
 		}

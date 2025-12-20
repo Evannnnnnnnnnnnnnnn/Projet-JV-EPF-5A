@@ -82,7 +82,7 @@ public class REDTurretsSelectEnemy : Action
         if (nbMissile < firstMissiles)
         {
             GameObject targetGameObject = new GameObject("FixedTarget");
-            targetGameObject.transform.position = new Vector3(9, 1, -2 + _myTurretId * 1 -5);
+            targetGameObject.transform.position = new Vector3(9, 1, -2 + _myTurretId * 1.5f -3);
             target.Value = targetGameObject.transform;
         } 
 
