@@ -49,18 +49,18 @@ public class ArmyManagerRed : ArmyManager
 	public override void ArmyElementHasBeenKilled(GameObject go)
 	{
 		base.ArmyElementHasBeenKilled(go);
-		if (m_ArmyElements.Count ==0)
+		if (m_ArmyElements.Count == 0)
 		{
-			GUIUtility.systemCopyBuffer = "0\t" +((int)Timer.Value).ToString()+"\t0\t0\t0";
+			BattleDataExporter.WriteBattleData(false, Timer.Value, 0, 0, 0);
+			SimulationManager.NotifyBattleEnded();
 		}
 	}
 	public void GreenArmyIsDead(string deadArmyTag)
  {
- int nDrones =0, nTurrets =0, health =0;
- ComputeStatistics(ref nDrones, ref nTurrets, ref health);
-		GUIUtility.systemCopyBuffer = "1\t" + ((int)Timer.Value).ToString() + "\t"+nDrones.ToString()+"\t"+nTurrets.ToString()+"\t"+health.ToString();
-		
-		RefreshHudDisplay(); //pour une dernière mise à jour en cas de victoire
+ 				int nDrones = 0, nTurrets = 0, health = 0;
+ 				ComputeStatistics(ref nDrones, ref nTurrets, ref health);
+ 				BattleDataExporter.WriteBattleData(true, Timer.Value, nDrones, nTurrets, health);
+ 				SimulationManager.NotifyBattleEnded();		RefreshHudDisplay(); //pour une derniï¿½re mise ï¿½ jour en cas de victoire
 	}
 
 }

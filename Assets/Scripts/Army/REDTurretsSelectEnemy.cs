@@ -37,6 +37,12 @@ public class REDTurretsSelectEnemy : Action
     }
 
 
+    public static void Reset()
+    {
+        _nextTurretId = 0;
+        _missileFiredCount = 0;
+    }
+
     public override void OnAwake()
     {
         m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
@@ -44,7 +50,6 @@ public class REDTurretsSelectEnemy : Action
         _isEven = _myTurretId % 2 == 0;
 
         target.Value = null;
-        _missileFiredCount = 0;
     }
 
     public override TaskStatus OnUpdate()

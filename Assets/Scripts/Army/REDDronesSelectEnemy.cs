@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 using System.Collections.Generic;
@@ -26,6 +26,11 @@ public class REDDronesSelectEnemy : Action
     ArmyElement third_target;
     ArmyElement last_target;
 
+
+    public static void Reset()
+    {
+        _nextDroneId = 0;
+    }
 
     public override void OnAwake()
     {

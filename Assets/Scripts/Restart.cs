@@ -1,12 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Restart : MonoBehaviour
 {
-	public void RestartSameLevel()
-	{
-		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-	}
+    public SimulationManager simulationManager;
+
+    public void RestartSameLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void StartSimulation()
+    {
+        if (simulationManager != null)
+        {
+            simulationManager.StartSimulation();
+        }
+        else
+        {
+            Debug.LogError("SimulationManager not set on Restart script!");
+        }
+    }
 }
