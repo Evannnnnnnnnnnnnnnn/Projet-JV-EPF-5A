@@ -1,15 +1,16 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.SceneManagement; // Added for SceneManager
+using UnityEngine.SceneManagement;
 
 public class SimulationManager : MonoBehaviour
 {
     public static SimulationManager Instance { get; private set; }
-
     public static bool IsSimulationRunning { get; private set; } = false;
+    public static int CurrentBattleIndex { get; private set; } = 0;
 
     private int simulationCount = 20;
     private int currentSimulation = 0;
+    private bool simulationShouldStart = false;
 
     void Awake()
     {
@@ -38,34 +39,42 @@ public class SimulationManager : MonoBehaviour
     {
         REDTurretsSelectEnemy.Reset();
         REDDronesSelectEnemy.Reset();
+
+        if (simulationShouldStart)
+        {
+            simulationShouldStart = false;
+            IsSimulationRunning = true;
+            currentSimulation = 0;
+            CurrentBattleIndex = 0;
+            StartCoroutine(SimulationLoop());
+        }
     }
 
     public void StartSimulation()
     {
         if (IsSimulationRunning) return;
 
-        IsSimulationRunning = true;
-        currentSimulation = 0;
-        StartCoroutine(SimulationLoop());
+        BattleDataExporter.ResetAndPrepareFile();
+        simulationShouldStart = true;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private IEnumerator SimulationLoop()
     {
         while (currentSimulation < simulationCount)
         {
-            // Wait for the end of the current battle
+            CurrentBattleIndex = currentSimulation;
             yield return new WaitUntil(() => !IsSimulationRunning || BattleHasEnded());
 
             if (!IsSimulationRunning)
             {
-                yield break; // Stop the loop if simulation was cancelled
+                yield break;
             }
             
             currentSimulation++;
 
             if (currentSimulation < simulationCount)
             {
-                // Restart the scene for the next battle
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
             else
@@ -76,7 +85,6 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-    // This method needs to be called when the battle ends
     public static void NotifyBattleEnded()
     {
         if (Instance != null)
@@ -90,7 +98,7 @@ public class SimulationManager : MonoBehaviour
     {
         if (battleEnded)
         {
-            battleEnded = false; // Reset for the next battle
+            battleEnded = false;
             return true;
         }
         return false;

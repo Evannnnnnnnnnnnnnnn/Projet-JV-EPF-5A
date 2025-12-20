@@ -51,16 +51,27 @@ public class ArmyManagerRed : ArmyManager
 		base.ArmyElementHasBeenKilled(go);
 		if (m_ArmyElements.Count == 0)
 		{
-			BattleDataExporter.WriteBattleData(false, Timer.Value, 0, 0, 0);
+			ArmyManagerGreen greenManager = Object.FindObjectOfType<ArmyManagerGreen>();
+			if (greenManager != null)
+			{
+				int nDrones = 0, nTurrets = 0, health = 0;
+				greenManager.GetStatistics(ref nDrones, ref nTurrets, ref health);
+				BattleDataExporter.WriteBattleData(SimulationManager.CurrentBattleIndex, false, Timer.Value, nDrones, nTurrets, health);
+			}
+			else
+			{
+				BattleDataExporter.WriteBattleData(SimulationManager.CurrentBattleIndex, false, Timer.Value, 0, 0, 0);
+			}
 			SimulationManager.NotifyBattleEnded();
 		}
 	}
 	public void GreenArmyIsDead(string deadArmyTag)
- {
- 				int nDrones = 0, nTurrets = 0, health = 0;
- 				ComputeStatistics(ref nDrones, ref nTurrets, ref health);
- 				BattleDataExporter.WriteBattleData(true, Timer.Value, nDrones, nTurrets, health);
- 				SimulationManager.NotifyBattleEnded();		RefreshHudDisplay(); //pour une derni�re mise � jour en cas de victoire
+	{
+		int nDrones = 0, nTurrets = 0, health = 0;
+		ComputeStatistics(ref nDrones, ref nTurrets, ref health);
+		BattleDataExporter.WriteBattleData(SimulationManager.CurrentBattleIndex, true, Timer.Value, nDrones, nTurrets, health);
+		SimulationManager.NotifyBattleEnded();
+		RefreshHudDisplay(); //pour une dernire mise  jour en cas de victoire
 	}
 
 }

@@ -131,6 +131,11 @@ public abstract class ArmyManager : MonoBehaviour
     }
     #endregion
 
+    public void GetStatistics(ref int nDrones, ref int nTurrets, ref int cumulatedHealth)
+    {
+        ComputeStatistics(ref nDrones, ref nTurrets, ref cumulatedHealth);
+    }
+
     protected void ComputeStatistics(ref int nDrones,ref int nTurrets,ref int cumulatedHealth)
 	{
         nDrones = m_ArmyElements.Count(item => item is Drone);
