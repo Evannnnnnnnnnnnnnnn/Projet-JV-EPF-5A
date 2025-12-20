@@ -22,9 +22,9 @@ public class REDTurretsSelectEnemy : Action
     ArmyElement lastTurret;
 
     private static int _nextTurretId = 0;
-    private int _myTurretId;
+    private int _myTurretId = 0;
 
-    private static int _missileFiredCount = 0;
+    private static int _missileFiredCount;
 
     public static void IncrementMissileCount()
     {
@@ -42,6 +42,9 @@ public class REDTurretsSelectEnemy : Action
         m_ArmyElement = (IArmyElement)GetComponent(typeof(IArmyElement));
         _myTurretId = System.Threading.Interlocked.Increment(ref _nextTurretId);
         _isEven = _myTurretId % 2 == 0;
+
+        target.Value = null;
+        _missileFiredCount = 0;
     }
 
     public override TaskStatus OnUpdate()

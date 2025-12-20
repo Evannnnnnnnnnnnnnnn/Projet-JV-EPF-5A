@@ -76,19 +76,7 @@ public class REDDronesSelectEnemy : Action
             }
             else if (_AllEnemiesDrones.Count > 0)
             {
-                ArmyElement closestDrone = null;
-                float minDistance = float.MaxValue;
-
-                foreach (ArmyElement drone in _AllEnemiesDrones)
-                {
-                    float distance = Vector3.Distance(transform.position, drone.transform.position);
-                    if (distance < minDistance)
-                    {
-                        minDistance = distance;
-                        closestDrone = drone;
-                    }
-                }
-                target.Value = closestDrone.transform;
+                target.Value = _AllEnemiesDrones[0].transform;
             }
             else if (_AllEnemiesTurrets.Count > 0)
             {
