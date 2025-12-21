@@ -182,7 +182,6 @@ public abstract class ArmyManager : MonoBehaviour
 }
 
 
-//QUARANTINE
 /*
  *     Dictionary<GameObject, GameObject> m_DicoWhoTargetsWhom = new Dictionary<GameObject, GameObject>();
 
